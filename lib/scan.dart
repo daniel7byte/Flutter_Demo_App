@@ -4,13 +4,17 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:http/http.dart' as http;
+
 class ScanScreen extends StatefulWidget {
   @override
   _ScanState createState() => new _ScanState();
 }
 
 class _ScanState extends State<ScanScreen> {
-  String barcode = "";
+
+  var barcode = "";
+  var respuesta = "";
 
   @override
   initState() {
@@ -19,6 +23,7 @@ class _ScanState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: new AppBar(
         title: new Text('ESCANER CEDULA'),
@@ -37,11 +42,26 @@ class _ScanState extends State<ScanScreen> {
                 onPressed: scan,
                 child: const Text('INICIAR ESCANEO')
               ),
-            )
-            ,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: RaisedButton(
+                  color: Colors.blue,
+                  textColor: Colors.white,
+                  splashColor: Colors.blueGrey,
+                  onPressed: (){
+                    barcodeSetter(this.barcode);
+                  },
+                  child: const Text('ENVIAR')
+              ),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(barcode, textAlign: TextAlign.left,),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(respuesta, textAlign: TextAlign.left,),
             ),
           ],
         ),
@@ -51,8 +71,8 @@ class _ScanState extends State<ScanScreen> {
 
   Future scan() async {
     try {
-      String barcode = await BarcodeScanner.scan();
-      setState(() => this.barcode = barcode);
+      String newBarcode = await BarcodeScanner.scan();
+      setState(() => this.barcode = newBarcode);
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
@@ -66,5 +86,19 @@ class _ScanState extends State<ScanScreen> {
     } catch (e) {
       setState(() => this.barcode = 'Unknown error: $e');
     }
+  }
+
+  void barcodeSetter(myBarcode) async{
+
+    setState(() => this.respuesta = 'SERVER: Loading...');
+
+    var responseServer = "";
+
+    var url = "https://daniel7byte-testing.herokuapp.com/index.php";
+    await http.post(url, body: {"string": myBarcode}).then((response) {
+      responseServer = "\nResponse status: ${response.statusCode}" + "\nResponse body: ${response.body}";
+    });
+
+    setState(() => this.respuesta = 'SERVER: ${responseServer.toString()}');
   }
 }

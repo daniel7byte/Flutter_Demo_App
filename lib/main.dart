@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'scan.dart';
 import 'signature_pad_native.dart';
+import 'location.dart';
 
 void main() => runApp(MaterialApp(
       home: MyApp(),
@@ -53,7 +54,22 @@ class _MyAppState extends State<MyApp> {
                           MaterialPageRoute(builder: (context) => SignaturePadNative()),
                         );
                       },
-                      child: const Text('FIRMA DIGITAL NATIVA')
+                      child: const Text('FIRMA DIGITAL')
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  child: RaisedButton(
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      splashColor: Colors.blueGrey,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => PageLocation()),
+                        );
+                      },
+                      child: const Text('GEOLOCALIZACION')
                   ),
                 ),
             ],
